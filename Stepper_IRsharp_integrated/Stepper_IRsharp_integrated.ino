@@ -43,9 +43,8 @@ void resetEDPins()
 
 void StepForward(float angle)
 {
-  Serial.println("Moving motor by");
+  Serial.println("Moving motor by (°) ");
   Serial.println(angle);
-  Serial.println("°");
   digitalWrite(dir, LOW);
   float steps;
   steps = 8.89*angle;
