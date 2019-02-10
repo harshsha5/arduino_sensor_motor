@@ -46,17 +46,32 @@ void StepForward(float angle)
   Serial.println("Moving motor by");
   Serial.println(angle);
   Serial.println("°");
-  if(angle > 0)
-  {
-    digitalWrite(dir, LOW); //Pull direction pin low to move "forward"
-  }
-  else
-  {
-    digitalWrite(dir, HIGH); //Pull direction pin high to move in "reverse"
-  }
+  digitalWrite(dir, LOW);
   float steps;
   steps = 8.89*angle;
   steps = int(steps);
+  
+  for(x= 0; x<steps; x++)  //Loop the forward stepping enough times for motion to be visible
+  {
+    digitalWrite(stp,HIGH); //Trigger one step forward
+    delayMicroseconds(1000);
+    digitalWrite(stp,LOW); //Pull step pin low so it can be triggered again
+    delayMicroseconds(1000);
+  }
+  Serial.println();
+}
+
+void ReverseStep(float angle)
+{
+  Serial.println("Moving motor by");
+  Serial.println(angle);
+  Serial.println("°");
+  digitalWrite(dir, HIGH);
+
+  float steps;
+  steps = 8.89*angle;
+  steps = int(steps);
+  steps = steps*-1;
   
   for(x= 0; x<steps; x++)  //Loop the forward stepping enough times for motion to be visible
   {
@@ -86,11 +101,21 @@ void loop() {
       user_angle = (dis-prev)*5;
       digitalWrite(EN, LOW); //Pull enable pin low to allow motor control
       digitalWrite(dir, LOW); //Pull direction pin low to move "forward"
-      StepForward(user_angle);
+
+      if(user_angle >0)
+      {
+        StepForward(user_angle);
+      }
+      
+      else 
+      {
+        ReverseStep(user_angle);
+      }
+      
       resetEDPins();
       unsigned long endTime=millis()-startTime;  // end time
       
-      //Serial.print("Time taken for process (ms): ");
+//      Serial.print("Time taken for process (ms): ");
 //      Serial.println(endTime);  
       prev = dis;
   }
