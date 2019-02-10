@@ -43,17 +43,8 @@ void resetEDPins()
 
 void StepForward(float angle)
 {
-  Serial.println("Moving motor...");
+  Serial.println("Moving motor in forward..");
   Serial.println(angle);
-  
-  if(angle > 0)
-  {
-    digitalWrite(dir, LOW); //Pull direction pin low to move "forward"
-  }
-  else
-  {
-  digitalWrite(dir, HIGH); //Pull direction pin low to move "forward"
-  }
   float steps;
   steps = 8.89*angle;
   steps = int(steps);
@@ -68,17 +59,60 @@ void StepForward(float angle)
   Serial.println();
 }
 
+//void ReverseStep(float angle)
+//{ Serial.println("Moving motor in reverse");
+//  float steps;
+//  steps = 8.89*angle;
+//  steps = int(steps);
+//
+//  digitalWrite(dir, HIGH); //Pull direction pin high to move in "reverse"
+//  for(x= 1; x<steps; x++)  //Loop the stepping enough times for motion to be visible
+//  {
+//    digitalWrite(stp,HIGH); //Trigger one step
+//    delay(1);
+//    digitalWrite(stp,LOW); //Pull step pin low so it can be triggered again
+//    delay(1);
+//  }
+//}
+
+void ReverseStepDefault(float angle)
+{
+  Serial.println("Moving motor in reverse..");
+  digitalWrite(dir, HIGH); //Pull direction pin high to move in "reverse"
+  float stepo;
+  stepo = 8.89*angle;
+  stepo = int(stepo);
+  stepo = stepo*-1;
+  for(x= 1; x<stepo; x++)  //Loop the stepping enough times for motion to be visible
+  {
+    digitalWrite(stp,HIGH); //Trigger one step
+    delay(1);
+    digitalWrite(stp,LOW); //Pull step pin low so it can be triggered again
+    delay(1);
+  }
+
+}
+
 void loop() {
   while(Serial.available()){
       //user_input = Serial.readString(); //Read user input and trigger appropriate function
+      digitalWrite(EN, LOW); //Pull enable pin low to allow motor control
       user_angle = Serial.parseFloat();
-      if(user_angle == 0)
+      if(user_angle >0)
+      {
+        StepForward(user_angle);
+      }
+      
+      else if(user_angle <0)
+      {
+        ReverseStepDefault(user_angle);
+      }
+      
+      else
       {
         continue;
       }
-      digitalWrite(EN, LOW); //Pull enable pin low to allow motor control
-      //digitalWrite(dir, LOW); //Pull direction pin low to move "forward"
-      StepForward(user_angle);
+
       resetEDPins();
   }
 
